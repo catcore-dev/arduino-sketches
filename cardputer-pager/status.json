@@ -1,0 +1,38 @@
+{
+  "plan": "FIX: Add UDP beacon listener to receiver + rebuild + flash",
+  "status": "done",
+  "current_step": "done",
+  "steps": [
+    {
+      "id": "01-build-receiver",
+      "status": "ok",
+      "duration": 14.4,
+      "description": "Сборка receiver (Cardputer) с UDP-слушателем"
+    },
+    {
+      "id": "02-build-sender",
+      "status": "ok",
+      "duration": 15.0,
+      "description": "Сборка sender (M5StickC) — фикс forward declaration"
+    },
+    {
+      "id": "03-flash-receiver",
+      "status": "ok",
+      "duration": 22.1,
+      "description": "Прошивка Cardputer на COM3"
+    },
+    {
+      "id": "04-flash-sender",
+      "status": "ok",
+      "duration": 26.9,
+      "description": "Прошивка M5StickC на COM11"
+    },
+    {
+      "id": "05-verify",
+      "status": "ok",
+      "duration": 0.3,
+      "description": "Проверить что firmware.bin свежие"
+    }
+  ],
+  "error": null
+}

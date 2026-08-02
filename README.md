@@ -1,51 +1,73 @@
 # arduino-sketches
 
-**Мои проекты на Arduino и ESP32. TFT-дисплеи, датчики, реле, умный дом.**
+**Embedded projects on Arduino, ESP32, and M5Stack. Tested on real hardware.**
 
----
+Started with blinking an LED, like everyone. Then wanted something useful — a display showing text from an SD card, a temperature sensor controlling a relay, a menu on an LCD. Built a few things. Some work great, some were just for fun.
 
-Начинал с мигания светодиодом, как и все. Потом захотелось чего-то полезного — чтобы экран показывал текст с SD-карты, датчик температуры управлял реле, дисплей реагировал на кнопки. Собрал пару работающих штук.
+## Projects
 
-## Проекты
+### 1. Smart Home Sensor
 
-### 1. TFT SD Reader
+Temperature and humidity sensor (DHT22), motion detector (PIR), relay for light control. All displayed on a 16x2 LCD with button-based menu navigation. Auto-turns off the light 30 seconds after no motion.
 
-Читает текстовый файл с SD-карты и выводит на TFT-дисплей. Обновляется каждые 5 секунд.
+**Hardware**: Arduino, DHT22, PIR, relay, LCD 16x2, push button
 
-**Железо:** TFT_eSPI-совместимый дисплей, SPI, SD-карта
+### 2. TFT SD Reader
 
-**Файлы:** `tft-sd-reader/tft-sd-reader.ino`
+Reads a text file from an SD card and displays it on a TFT screen. Refreshes every 5 seconds.
 
-### 2. Smart Home Sensor
+**Hardware**: TFT_eSPI-compatible display, SPI, SD card
 
-Датчик температуры и влажности (DHT22), датчик движения (PIR), реле для управления светом. Всё выводится на LCD 16×2 с меню навигации по кнопке. Если движения нет 30 секунд — свет выключается.
+### 3. M5Stack Cardputer Projects
 
-**Железо:** Arduino, DHT22, PIR, реле, LCD 16×2, кнопка
+A collection of apps and tools I wrote for the M5Stack Cardputer:
 
-**Файлы:** `smart-home-sensor/smart-home-sensor.ino`
+| Project | Description | Lines |
+|---------|------------|-------|
+| **cardputer-alarm-clock** | Full alarm clock with RTC, buzzer, LCD menu system. Multiple alarms, time display, settings. | ~5400 C++ |
+| **cardputer-gif-player** | Plays GIF animations on the Cardputer screen with SD card support. | ~6900 C++ |
+| **cardputer-matrix** | Matrix-style rain effect on the display. | ~1600 C++ |
+| **cardputer-notes** | Note-taking app with keyboard input and serial sync. Includes Python companion scripts. | ~7700 C++ |
+| **cardputer-pager** | Two-device paging system — sender sends messages, receiver displays them. Uses ESP-NOW. | ~1500 C++ |
+| **cardputer-pong** | Pong game for the Cardputer with keyboard controls and display. | ~6700 C++ |
+| **cardputer-snake** | Snake game with keyboard input. | ~3600 C++ |
 
-## Структура
+All Cardputer projects use PlatformIO build system and the M5Stack Cardputer board definition.
+
+## Structure
 
 ```
-├── tft-sd-reader/
-│   ├── tft-sd-reader.ino
-│   └── README.md         # схема подключения, список компонентов
 ├── smart-home-sensor/
-│   ├── smart-home-sensor.ino
-│   └── README.md
-├── assets/                # фото и схемы
-└── README.md              # этот файл
+│   └── smart-home-sensor.ino
+├── tft-sd-reader/
+│   └── tft-sd-reader.ino
+├── cardputer-alarm-clock/
+│   ├── src/            # C++ source
+│   ├── boards/         # board config
+│   └── platformio.ini
+├── cardputer-gif-player/
+│   ├── src/
+│   └── platformio.ini
+├── cardputer-matrix/
+│   ├── src/
+│   └── platformio.ini
+├── cardputer-notes/
+│   ├── src/
+│   └── platformio.ini
+├── cardputer-pager/
+│   ├── receiver/       # PlatformIO project
+│   └── sender/         # PlatformIO project
+├── cardputer-pong/
+│   ├── src/
+│   └── platformio.ini
+└── cardputer-snake/
+    ├── src/
+    └── platformio.ini
 ```
 
-## Почему так мало
+## Notes
 
-Я больше занимаюсь серверной частью и DevOps. Arduino для меня — хобби. Но эти скетчи реально работают, проверены на железе.
-
----
-
-## English
-
-Arduino and ESP32 hobby projects. TFT display with SD card reader, smart home sensor with DHT22 + PIR + relay + LCD menu. All tested on real hardware.
+These sketches are real and tested. Most of the server-side stuff is in my other repos — this is the hardware side of things. I write whatever C++ the project needs — not an embedded systems purist, but I ship working code.
 
 ---
 

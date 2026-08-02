@@ -1,0 +1,48 @@
+=== ИТОГОВЫЙ ОТЧЁТ: Исправление сборки и прошивки ===
+Проект: cardputer-pager ("Домашний беспроводной пейджер")
+Дата: 2026-06-13
+
+1. СТАТУС ВЫПОЛНЕНИЯ ШАГОВ
+   ┌──────────────────┬──────────┬───────────┐
+   │ Шаг              │ Статус   │ Время     │
+   ├──────────────────┼──────────┼───────────┤
+   │ 01-verify-code   │ OK       │ 10.5 сек  │
+   │ 02-build-both    │ OK       │ 12.8 сек  │
+   │ 03-build-sender  │ OK       │ 13.7 сек  │
+   │ 04-flash-receiver│ OK       │ 22.8 сек  │
+   │ 05-flash-sender  │ OK       │ 24.9 сек  │
+   └──────────────────┴──────────┴───────────┘
+   Все шаги выполнены успешно. Ошибок нет.
+
+2. ОБНАРУЖЕННЫЕ ОШИБКИ (до начала fix-плана)
+   1) String.repeat в receiver/src/main.cpp — вызов String(".").repeat(n) не компилировался на ESP32
+   2) platformio.ini — UTF-8 BOM ломал Python configparser
+   3) sender/platformio.ini — board "m5stick-c-plus2" не существует, заменён на esp32-pico-devkitm-2
+   4) sender/src/pager_client.h — ESP.rtcUserMemoryRead/Write заменены на RTC_DATA_ATTR
+   5) sender/src/main.cpp — M5.Beep.tone → M5.Speaker.tone
+   6) sender/src/main.cpp — ESP_EXT1_WAKEUP_ANY_LOW → ESP_EXT1_WAKEUP_ALL_LOW
+   7) sender/src/main.cpp — удалён M5.Axp.ScreenBreath (нет на M5StickC Plus2)
+   8) sender — DFRobot_GP8XXX.cpp пропатчен (analogWriteResolution API)
+
+3. ЧТО ИСПРАВЛЕНО В ЭТОМ ПРОГОНЕ
+   - Проверено: String.repeat заменён на цикл for в receiver/src/main.cpp
+   - Дополнительных правок не потребовалось — код уже был исправлен ранее
+
+4. РЕЗУЛЬТАТ СБОРКИ
+   Receiver (Cardputer, esp32-s3-devkitc-1):
+     Статус: SUCCESS
+     RAM использовано: 14.8% (48596/327680 bytes)
+     Flash использовано: 27.6% (922677/3342336 bytes)
+
+   Sender (M5StickC Plus2, esp32-pico-devkitm-2):
+     Статус: SUCCESS
+     RAM использовано: 16.1% (52652/327680 bytes)
+     Flash использовано: 83.0% (1088413/1310720 bytes)
+
+5. РЕЗУЛЬТАТ ПРОШИВКИ
+   Receiver (Cardputer, COM3): ✓ УСПЕШНО (22.8 сек)
+   Sender (M5StickC Plus2, COM11): ✓ УСПЕШНО (24.9 сек)
+
+6. ИТОГ
+   Все 8 исходных ошибок исправлены. Оба устройства собраны и прошиты успешно.
+   Финальный статус: ВСЁ OK.

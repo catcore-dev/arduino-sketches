@@ -1,0 +1,45 @@
+{
+  "project": "cardputer-snake",
+  "title": "Фикс багов Snake",
+  "steps": [
+    {
+      "id": "01-fix-code",
+      "type": "model",
+      "description": "Исправить main.cpp — 4 бага",
+      "prompt": "worker: прочитай D:\\opencode-night\\projects\\cardputer-snake\\src\\main.cpp и исправь 4 бага. Не добавляй комментарии. Баги:\n1) moveSnake(), строка где for i < tailLen-1: tail[i] = tail[i+1] — это сдвиг влево (неправильно). Надо сдвигать вправо: for (int i = tailLen - 1; i > 0; i--) { tail[i] = tail[i - 1]; } и потом tail[0] = {nx, ny} вне if/else. В ate-ветке оставить сдвиг вправо, но tail[0] = nx,ny тоже вынести за if/else.\n2) Убрать обёртку M5Cardputer.Keyboard.isChange() в loop(). Проверять isKeyPressed напрямую.\n3) drawCell заменить CELL-1 на CELL.\n4) randomSeed заменить batteryLevel на micros().\nСохрани файл. Проверь что файл изменился (контролируй размер/содержимое).",
+      "timeout": 60
+    },
+    {
+      "id": "02-clean",
+      "type": "shell",
+      "description": "Очистить сборку",
+      "cmd": "pio run --target clean 2>&1",
+      "cwd": "D:\\opencode-night\\projects\\cardputer-snake",
+      "timeout": 30
+    },
+    {
+      "id": "03-build",
+      "type": "shell",
+      "description": "Собрать исправленную прошивку",
+      "cmd": "pio run 2>&1",
+      "cwd": "D:\\opencode-night\\projects\\cardputer-snake",
+      "timeout": 180
+    },
+    {
+      "id": "04-flash",
+      "type": "shell",
+      "description": "Прошить Cardputer",
+      "cmd": "pio run --target upload 2>&1",
+      "cwd": "D:\\opencode-night\\projects\\cardputer-snake",
+      "timeout": 120
+    },
+    {
+      "id": "05-verify",
+      "type": "shell",
+      "description": "Проверить firmware.bin",
+      "cmd": "if (Test-Path '.pio\\build\\esp32-s3-devkitc-1\\firmware.bin') { $size = (Get-Item '.pio\\build\\esp32-s3-devkitc-1\\firmware.bin').Length; Write-Output \"firmware.bin size: $size bytes\" } else { Write-Error 'firmware.bin not found'; exit 1 }",
+      "cwd": "D:\\opencode-night\\projects\\cardputer-snake",
+      "timeout": 10
+    }
+  ]
+}

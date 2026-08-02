@@ -1,0 +1,38 @@
+{
+  "project": "cardputer-alarm-clock",
+  "title": "Исправление и перепрошивка будильника",
+  "model": "opencode/big-pickle",
+  "git_snapshots": false,
+  "steps": [
+    {
+      "id": "01-fix-platformio",
+      "type": "model",
+      "description": "Исправить platformio.ini: board, флаги, USB CDC",
+      "prompt": "worker: Исправь файл projects/cardputer-alarm-clock/platformio.ini. Нужно: 1) Сменить board с 'm5stack-cardputer' на 'esp32-s3-devkitc-1' (как в рабочем проекте cardputer-pong) 2) Убрать board_build.mcu, board_build.f_cpu, board_build.flash_mode, board_build.flash_size, board_build.partitions, board_build.arduino.memory_type 3) Убрать флаг -DARDUINO_USB_MODE=0, заменить -DARDUINO_USB_CDC_ON_BOOT=0 на -DARDUINO_USB_CDC_ON_BOOT=1 4) Оставить build_flags: -DCONFIG_IDF_TARGET_ESP32S3, -DARDUINO_USB_CDC_ON_BOOT=1, -DBOARD_HAS_PSRAM 5) В lib_deps оставить только: m5stack/M5Cardputer@^1.1.3, m5stack/M5GFX@^0.2.0, m5stack/M5Unified@^0.2.0 (как в pong). Итоговый файл должен быть минимальным и рабочим.",
+      "expect": ["platformio.ini"],
+      "timeout": 30
+    },
+    {
+      "id": "02-fix-main",
+      "type": "model",
+      "description": "Исправить main.cpp: инициализация M5Cardputer и Serial",
+      "prompt": "worker: Исправь файл projects/cardputer-alarm-clock/src/main.cpp. Нужно: 1) Убрать #include <M5Unified.h> (он уже включен в M5Cardputer.h) 2) Исправить setup(): убрать 'auto cfg = M5.config(); M5Cardputer.begin(cfg);' — заменить на 'M5Cardputer.begin();' 3) Убрать Serial.begin(115200); delay(500); — вместо этого добавить Serial.begin(115200); после M5Cardputer.begin() 4) Все остальные классы и логику оставить без изменений 5) Убери 'M5Cardputer.Display.init();' — Display инициализируется в begin(). Файл должен сохранить всю функциональность, только исправить инициализацию.",
+      "expect": ["src\\main.cpp"],
+      "timeout": 30
+    },
+    {
+      "id": "03-build-flash",
+      "type": "shell",
+      "description": "Пересобрать и прошить Cardputer",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run --target upload }",
+      "timeout": 180
+    },
+    {
+      "id": "04-verify",
+      "type": "shell",
+      "description": "Проверить firmware.bin",
+      "cmd": "Test-Path -LiteralPath 'projects/cardputer-alarm-clock/.pio/build/esp32-s3-devkitc-1/firmware.bin'",
+      "timeout": 10
+    }
+  ]
+}

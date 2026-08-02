@@ -1,0 +1,82 @@
+{
+  "project": "cardputer-alarm-clock",
+  "title": "Будильник для M5Cardputer",
+  "model": "opencode/big-pickle",
+  "fallback_model": "anthropic/claude-sonnet-4-20250514",
+  "git_snapshots": true,
+  "telegram_token": "",
+  "telegram_chat_id": "",
+  "steps": [
+    {
+      "id": "01-create-project",
+      "type": "model",
+      "description": "Создать проект PlatformIO для M5Cardputer",
+      "prompt": "worker: Создай проект PlatformIO для M5Cardputer (M5Stack Cardputer) с фреймворком M5Unified. Напиши platformio.ini с платформой 'm5stack-cardputer', фреймворком 'arduino', библиотеками 'M5Unified', 'M5Cardputer' (или встроенная в M5Unified), 'Preferences' (встроенная в Arduino). Добавь src/main.cpp с минимальным шаблоном: инициализация M5Cardputer, включение дисплея, пустой loop. Файлы: projects/cardputer-alarm-clock/platformio.ini, projects/cardputer-alarm-clock/src/main.cpp. Сделай так, чтобы проект собирался через 'pio run'.",
+      "expect": ["platformio.ini", "src\\main.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "02-rtc-clock",
+      "type": "model",
+      "description": "Написать класс RTCClock для работы с BM8563",
+      "prompt": "worker: Напиши библиотеку для работы с RTC BM8563 на M5Cardputer. Создай файлы projects/cardputer-alarm-clock/src/RTCClock.h и projects/cardputer-alarm-clock/src/RTCClock.cpp. Класс RTCClock должен: - В конструкторе инициализировать RTC (через Wire, адрес 0x51) - setDateTime(year, month, day, hour, min, sec) - getDateTime() возвращающий struct tm - Автоматически определять наличие RTC при инициализации, возвращать true/false В main.cpp добавь тестовый вывод времени в Serial каждые 5 секунд. Используй .cpp/.h файлы.",
+      "expect": ["src\\RTCClock.h", "src\\RTCClock.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "03-clock-display",
+      "type": "model",
+      "description": "Написать класс ClockDisplay для отрисовки часов на экране",
+      "prompt": "worker: Напиши класс ClockDisplay для отображения часов на дисплее M5Cardputer. Файлы: projects/cardputer-alarm-clock/src/ClockDisplay.h, projects/cardputer-alarm-clock/src/ClockDisplay.cpp. Класс должен: - drawTime(int hour, int min, int sec) — крупные цифры во весь экран (шрифт крупный, примерно 3/4 высоты экрана) - drawDate(int year, int month, int day, int weekday) — мелким шрифтом дату и день недели сверху - drawAlarmStatus(bool isSet, int alarmHour, int alarmMin) — индикатор будильника в углу - drawSleepOverlay() — затемнение экрана для режима сна - Использовать M5Cardputer.Display (наследник M5GFX) - Чёрный фон, зелёные/циановые цифры (как будильник) - main.cpp: покажи часы с текущим временем из RTC, обновление раз в секунду",
+      "expect": ["src\\ClockDisplay.h", "src\\ClockDisplay.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "04-alarm-settings",
+      "type": "model",
+      "description": "Написать класс AlarmSettings для хранения времени будильника в NVS",
+      "prompt": "worker: Напиши класс AlarmSettings для хранения настроек будильника в энергонезависимой памяти (NVS/Preferences). Файлы: projects/cardputer-alarm-clock/src/AlarmSettings.h, projects/cardputer-alarm-clock/src/AlarmSettings.cpp. Класс должен: - Использовать Arduino Preferences (встроенная библиотека) - saveAlarmTime(int hour, int min) — сохранить время - getAlarmHour(), getAlarmMin() — прочитать время - isAlarmSet() — будильник активирован? - setAlarmEnabled(bool enabled) - getAlarmEnabled() - Сохранять флаг enabled + час + минуты в NVS - При старте читать из NVS, если нет данных — дефолт 07:00 выключен - clearAlarm() — сбросить - Также сохранять/читать время последней компиляции/timezone offset (на случай если RTC сбросился) - main.cpp: добавь тест: установить будильник 08:30, включить, перезагрузить, проверить что данные сохранились",
+      "expect": ["src\\AlarmSettings.h", "src\\AlarmSettings.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "05-keyboard-menu",
+      "type": "model",
+      "description": "Написать меню настройки будильника через клавиатуру Cardputer",
+      "prompt": "worker: Напиши класс AlarmMenu для настройки будильника через клавиатуру M5Cardputer. Файлы: projects/cardputer-alarm-clock/src/AlarmMenu.h, projects/cardputer-alarm-clock/src/AlarmMenu.cpp. Класс должен: - Экран настроек вызывается по нажатию кнопки 'Enter' (или '*' на клавиатуре) - Показывает: текущие часы будильника, минуты, статус включён/выключен - Навигация: стрелка вверх/вниз (W/S на клавиатуре) переключает поля (часы->минуты->вкл/выкл->выход) - Стрелка влево/вправо (A/D) меняет значение - Enter подтверждает и сохраняет через AlarmSettings - Escape (или клавиша '#'/'C') — выход без сохранения - Подсветка активного поля - Использовать M5Cardputer.Keyboard для чтения клавиш - main.cpp: добавь вызов меню по нажатию клавиши, покажи как это работает",
+      "expect": ["src\\AlarmMenu.h", "src\\AlarmMenu.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "06-alarm-buzzer",
+      "type": "model",
+      "description": "Написать класс AlarmBuzzer для звука будильника",
+      "prompt": "worker: Напиши класс AlarmBuzzer для звукового оповещения на M5Cardputer. Файлы: projects/cardputer-alarm-clock/src/AlarmBuzzer.h, projects/cardputer-alarm-clock/src/AlarmBuzzer.cpp. Класс должен: - Использовать M5Cardputer.Speaker (встроенный динамик/ buzzer) - playAlarm() — циклический звуковой сигнал (например 2 коротких, пауза, повтор) - stopAlarm() — остановить звук - isPlaying() — играет ли сейчас - Тоны: частота ~2000Hz, длительность 200ms, пауза 100ms, 3 раза, затем пауза 1 сек и повтор - Громкость умеренная (чтобы не раздражала, но слышно) - main.cpp: добавь тест: по нажатию кнопки 'X' играть звук 3 секунды, затем стоп",
+      "expect": ["src\\AlarmBuzzer.h", "src\\AlarmBuzzer.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "07-sleep-mode",
+      "type": "model",
+      "description": "Добавить режим сна экрана через заданное время бездействия",
+      "prompt": "worker: Добавь в main.cpp режим сна для экрана. Логика: - Если нет нажатий клавиш 30 секунд — экран гаснет (display.sleep() или заливка чёрным через ClockDisplay::drawSleepOverlay) - При нажатии любой клавиши — экран просыпается - При срабатывании будильника — экран тоже просыпается - Используй M5Cardputer.Power для управления питанием/экраном - main.cpp: интегрируй все компоненты в полную программу (см. ниже)",
+      "expect": ["src\\main.cpp"],
+      "timeout": 120
+    },
+    {
+      "id": "08-integrate-all",
+      "type": "model",
+      "description": "Интегрировать все компоненты в готовую программу main.cpp",
+      "prompt": "worker: Перепиши projects/cardputer-alarm-clock/src/main.cpp, интегрируя все компоненты в полноценный будильник. Логика программы: 1. setup(): - Инициализация M5Cardputer - Инициализация RTCClock (проверить, что RTC есть) - Загрузка AlarmSettings из NVS - Инициализация AlarmBuzzer - Отображение часов 2. loop(): - Каждую секунду: читаем время из RTC, обновляем ClockDisplay - Проверяем: если AlarmSettings.isAlarmSet() И текущее время == время будильника (часы + минуты, секунды 0) И будильник ещё не звонил сегодня — запускаем AlarmBuzzer::playAlarm() - Если играет будильник: проверяем клавиатуру — любая клавиша → AlarmBuzzer::stopAlarm() (отключаем до следующего дня) - Если будильник не играет: проверяем клавиши: Enter/* → открыть AlarmMenu - Режим сна: если 30 сек без нажатий → drawSleepOverlay(), по нажатию → выход из сна - Управление клавишами через M5Cardputer.Keyboard 3. Сброс флага будильника на новый день: отслеживать дату, когда будильник сработал; если наступил новый день — сбросить флаг Комментарии на русском/английском. Код должен компилироваться без ошибок.",
+      "expect": ["src\\main.cpp"],
+      "timeout": 180
+    },
+    {
+      "id": "09-build",
+      "type": "shell",
+      "description": "Сборка проекта через PlatformIO",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run }",
+      "timeout": 180
+    }
+  ]
+}

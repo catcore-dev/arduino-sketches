@@ -1,0 +1,28 @@
+{
+  "project": "cardputer-alarm-clock",
+  "title": "Очистка кэша и пересборка",
+  "git_snapshots": false,
+  "steps": [
+    {
+      "id": "01-clean-cache",
+      "type": "shell",
+      "description": "Очистить кэш сборки PlatformIO",
+      "cmd": "Remove-Item -Recurse -Force '.pio\\build\\m5stack-cardputer' -ErrorAction SilentlyContinue; Write-Output 'cache cleaned'",
+      "timeout": 30
+    },
+    {
+      "id": "02-build-only",
+      "type": "shell",
+      "description": "Собрать проект (без прошивки), чтобы проверить компиляцию",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run }",
+      "timeout": 180
+    },
+    {
+      "id": "03-flash",
+      "type": "shell",
+      "description": "Прошить Cardputer",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run --target upload }",
+      "timeout": 120
+    }
+  ]
+}

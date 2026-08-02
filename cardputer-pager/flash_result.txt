@@ -1,0 +1,12 @@
+Flash Result Report
+===================
+Project: cardputer-pager
+Date: 2026-06-13
+
+Step 05-flash-receiver: OK (24.6s)
+  - Прошивка Cardputer (receiver) на COM3 — успешно
+
+Step 06-flash-sender: OK (26.2s)
+  - Прошивка M5StickC Plus2 (sender) на COM11 — успешно
+
+Итог: обе прошивки загружены успешно. Ошибок нет.

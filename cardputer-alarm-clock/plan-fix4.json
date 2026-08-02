@@ -1,0 +1,42 @@
+{
+  "project": "cardputer-alarm-clock",
+  "title": "Переустановка PlatformIO ESP32 и пересборка",
+  "git_snapshots": false,
+  "steps": [
+    {
+      "id": "01-pio-upgrade",
+      "type": "shell",
+      "description": "Обновить PlatformIO core",
+      "cmd": "pio upgrade",
+      "timeout": 120
+    },
+    {
+      "id": "02-pio-update-platform",
+      "type": "shell",
+      "description": "Обновить ESP32 платформу",
+      "cmd": "pio platform update espressif32",
+      "timeout": 180
+    },
+    {
+      "id": "03-delete-pio-cache",
+      "type": "shell",
+      "description": "Полностью удалить .pio папку (все зависимости)",
+      "cmd": "Remove-Item -Recurse -Force '.pio' -ErrorAction SilentlyContinue; Write-Output 'pio deleted complete'",
+      "timeout": 30
+    },
+    {
+      "id": "04-build-only",
+      "type": "shell",
+      "description": "Собрать проект (с нуля, скачает всё заново)",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run }",
+      "timeout": 600
+    },
+    {
+      "id": "05-flash",
+      "type": "shell",
+      "description": "Прошить Cardputer",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run --target upload }",
+      "timeout": 120
+    }
+  ]
+}

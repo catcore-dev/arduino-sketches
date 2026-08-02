@@ -1,0 +1,46 @@
+{
+  "project": "cardputer-pager",
+  "title": "FIX: Add UDP beacon listener to receiver + rebuild + flash",
+  "git_snapshots": false,
+  "steps": [
+    {
+      "id": "01-build-receiver",
+      "type": "shell",
+      "description": "Сборка receiver (Cardputer) с UDP-слушателем",
+      "cmd": "pio run 2>&1",
+      "cwd": "D:/opencode-night/projects/cardputer-pager/receiver",
+      "timeout": 120
+    },
+    {
+      "id": "02-build-sender",
+      "type": "shell",
+      "description": "Сборка sender (M5StickC) — фикс forward declaration",
+      "cmd": "pio run 2>&1",
+      "cwd": "D:/opencode-night/projects/cardputer-pager/sender",
+      "timeout": 120
+    },
+    {
+      "id": "03-flash-receiver",
+      "type": "shell",
+      "description": "Прошивка Cardputer на COM3",
+      "cmd": "pio run --target upload --upload-port COM3 2>&1",
+      "cwd": "D:/opencode-night/projects/cardputer-pager/receiver",
+      "timeout": 120
+    },
+    {
+      "id": "04-flash-sender",
+      "type": "shell",
+      "description": "Прошивка M5StickC на COM11",
+      "cmd": "pio run --target upload --upload-port COM11 2>&1",
+      "cwd": "D:/opencode-night/projects/cardputer-pager/sender",
+      "timeout": 120
+    },
+    {
+      "id": "05-verify",
+      "type": "shell",
+      "description": "Проверить что firmware.bin свежие",
+      "cmd": "Write-Output \"=== Receiver ===\"; Get-ChildItem \"D:\\opencode-night\\projects\\cardputer-pager\\receiver\\.pio\\build\\esp32-s3-devkitc-1\\firmware.bin\" | Select-Object Name,Length,LastWriteTime; Write-Output \"`n=== Sender ===\"; Get-ChildItem \"D:\\opencode-night\\projects\\cardputer-pager\\sender\\.pio\\build\\esp32-pico-devkitm-2\\firmware.bin\" | Select-Object Name,Length,LastWriteTime",
+      "timeout": 10
+    }
+  ]
+}

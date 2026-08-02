@@ -1,0 +1,38 @@
+{
+  "project": "cardputer-alarm-clock",
+  "title": "Исправление RTC и клавиатуры",
+  "model": "opencode/big-pickle",
+  "git_snapshots": false,
+  "steps": [
+    {
+      "id": "01-fix-rtc",
+      "type": "model",
+      "description": "Исправить RTCClock.cpp — убрать повторный Wire.begin()",
+      "prompt": "worker: Исправь файл projects/cardputer-alarm-clock/src/RTCClock.cpp. Проблема: метод begin() вызывает _wire->begin(), но Wire уже инициализирован в M5Cardputer.begin(). Из-за повторного вызова begin() RTC BM8563 не обнаруживается. Решение: просто удали строку '_wire->begin();' из метода 'bool RTCClock::begin(TwoWire &wire)'. Также убедись что метод begin использует готовый Wire, который уже настроен на правильные пины M5Cardputer. Ничего другого не меняй.",
+      "expect": ["src\\RTCClock.cpp"],
+      "timeout": 30
+    },
+    {
+      "id": "02-fix-platformio",
+      "type": "model",
+      "description": "Вернуть board m5stack-cardputer с правильными флагами",
+      "prompt": "worker: Исправь файл projects/cardputer-alarm-clock/platformio.ini. Проблема: board = esp32-s3-devkitc-1 не определяет правильно пины клавиатуры M5Cardputer. Решение: 1) Верни board = m5stack-cardputer (оригинальная плата) 2) Добавь минимальные build_flags: -DARDUINO_USB_CDC_ON_BOOT=1 -DBOARD_HAS_PSRAM (только эти два флага, без остальных) 3) lib_deps оставь: m5stack/M5Cardputer@^1.1.1, m5stack/M5GFX@^0.2.0, m5stack/M5Unified@^0.2.0 4) monitor_speed = 115200 Итоговый файл должен быть минимальным и собираться. Убери все лишние board_build.* флаги.",
+      "expect": ["platformio.ini"],
+      "timeout": 30
+    },
+    {
+      "id": "03-build-flash",
+      "type": "shell",
+      "description": "Пересобрать и прошить Cardputer",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run --target upload }",
+      "timeout": 180
+    },
+    {
+      "id": "04-verify",
+      "type": "shell",
+      "description": "Проверить что прошивка собралась",
+      "cmd": "Test-Path -LiteralPath 'projects/cardputer-alarm-clock/.pio/build/m5stack-cardputer/firmware.bin'",
+      "timeout": 10
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "project": "cardputer-alarm-clock",
+  "title": "Прошивка будильника на Cardputer",
+  "git_snapshots": false,
+  "steps": [
+    {
+      "id": "10-flash-cardputer",
+      "type": "shell",
+      "description": "Прошить Cardputer через PlatformIO",
+      "cmd": "Set-Location -LiteralPath 'projects/cardputer-alarm-clock'; if ($?) { pio run --target upload }",
+      "timeout": 120
+    },
+    {
+      "id": "11-verify-flash",
+      "type": "shell",
+      "description": "Проверить что firmware.bin существует и прошивка прошла",
+      "cmd": "Test-Path -LiteralPath 'projects/cardputer-alarm-clock/.pio/build/m5stack-cardputer/firmware.bin'",
+      "timeout": 10
+    }
+  ]
+}

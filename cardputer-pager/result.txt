@@ -1,0 +1,24 @@
+=== Результат сборки проекта "Домашний беспроводной пейджер" ===
+
+Receiver (Cardputer, esp32-s3-devkitc-1):
+  Статус: SUCCESS
+  Время сборки: 62.6 сек
+  Размер firmware.bin: (в .pio/build/esp32-s3-devkitc-1/firmware.bin)
+  RAM использовано: 14.8% (48596/327680 bytes)
+  Flash использовано: 27.6% (922677/3342336 bytes)
+
+Sender (M5StickC Plus2, esp32-pico-devkitm-2):
+  Статус: SUCCESS
+  Время сборки: 22.0 сек
+  Размер firmware.bin: (в .pio/build/esp32-pico-devkitm-2/firmware.bin)
+  RAM использовано: 16.1% (52652/327680 bytes)
+  Flash использовано: 83.0% (1088413/1310720 bytes)
+
+Исправления, внесённые в процессе:
+1. platformio.ini: удалён BOM (UTF-8 BOM ломал Python configparser)
+2. sender/platformio.ini: board m5stick-c-plus2 → esp32-pico-devkitm-2 (board не существовал)
+3. sender/src/pager_client.h: ESP.rtcUserMemoryRead/Write → RTC_DATA_ATTR переменные
+4. sender/src/main.cpp: M5.Beep.tone → M5.Speaker.tone
+5. sender/src/main.cpp: ESP_EXT1_WAKEUP_ANY_LOW → ESP_EXT1_WAKEUP_ALL_LOW
+6. sender/src/main.cpp: удалён M5.Axp.ScreenBreath (нет на M5StickC Plus2)
+7. sender: DFRobot_GP8XXX.cpp пропатчен (analogWriteResolution API)
